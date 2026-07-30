@@ -1,0 +1,173 @@
+import { Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { DashboardRedirect } from "./components/auth/DashboardRedirect";
+import { Login } from "./components/auth/login";
+import { Signup } from "./components/auth/signup";
+import { ForgotPassword } from "./components/auth/ForgotPassword";
+import { AdminDashboard } from "./pages/dashboards/AdminDashboard";
+import { ManagerDashboard } from "./pages/dashboards/ManagerDashboard";
+
+import { Products } from "./pages/admin/Products";
+import { Warehouses } from "./pages/admin/Warehouses";
+import { Users } from "./pages/admin/Users";
+import { StockManagement } from "./pages/admin/StockManagement";
+import { Settings } from "./pages/admin/Settings";
+import { Receipts } from "./pages/manager/Receipts";
+import { Deliveries } from "./pages/manager/Deliveries";
+import { Transfers } from "./pages/manager/Transfers";
+import { Adjustments } from "./pages/manager/Adjustments";
+import { StockLedger } from "./pages/manager/StockLedger";
+import { ViewStock } from "./pages/warehouse/ViewStock";
+import { Profile } from "./pages/Profile";
+import { Unauthorized } from "./pages/Unauthorized";
+import { WarehouseDashboard } from './pages/dashboards/WarehouseDashboard';
+
+function App() {
+  return (
+    <AuthProvider>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
+
+        {/* Protected routes with RBAC */}
+        <Route
+          path="/dashboard/admin"
+          element={
+            <ProtectedRoute requiredRoles="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/manager"
+          element={
+            <ProtectedRoute requiredRoles="manager">
+              <ManagerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/warehouse"
+          element={
+            <ProtectedRoute requiredRoles="warehouse">
+              <WarehouseDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/products"
+          element={
+            <ProtectedRoute requiredRoles={['admin', 'manager']}>
+              <Products />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/warehouses"
+          element={
+            <ProtectedRoute requiredRoles="admin">
+              <Warehouses />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute requiredRoles="admin">
+              <Users />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/stock"
+          element={
+            <ProtectedRoute requiredRoles={['admin', 'manager']}>
+              <StockManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute requiredRoles="admin">
+              <Settings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/receipts"
+          element={
+            <ProtectedRoute requiredRoles={['admin', 'manager', 'warehouse']}>
+              <Receipts />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/deliveries"
+          element={
+            <ProtectedRoute requiredRoles={['admin', 'manager', 'warehouse']}>
+              <Deliveries />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/transfers"
+          element={
+            <ProtectedRoute requiredRoles={['admin', 'manager', 'warehouse']}>
+              <Transfers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/adjustments"
+          element={
+            <ProtectedRoute requiredRoles={['admin', 'manager', 'warehouse']}>
+              <Adjustments />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ledger"
+          element={
+            <ProtectedRoute requiredRoles={['admin', 'manager', 'warehouse']}>
+              <StockLedger />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/stock"
+          element={
+            <ProtectedRoute requiredRoles={['admin', 'manager', 'warehouse']}>
+              <ViewStock />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Default redirects */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardRedirect />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </AuthProvider>
+  );
+}
+
+export default App;
