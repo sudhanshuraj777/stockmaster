@@ -17,15 +17,33 @@ import ledgerRoutes from "./routes/ledgerRoutes.js";
 dotenv.config();
 const app = express();
 
+// Connect DB (Moved to top to prevent routing errors during initialization)
+connectDB();
+
 // Middleware
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173", // Standard Vite development port
+  process.env.FRONTEND_URL  // Your production frontend URL (e.g., Vercel/Netlify link)
+].filter(Boolean); // Dynamically removes undefined values if FRONTEND_URL isn't set yet
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow server-to-server requests, Postman, or mobile apps (no origin header)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true // Set to true to support secure cookies, tokens, and sessions
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Connect DB
-connectDB();
-
-// Routes
+// Base Route
 app.get("/", (req, res) => {
   res.json({ 
     message: "StockMaster API is running...",
